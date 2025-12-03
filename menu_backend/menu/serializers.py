@@ -66,7 +66,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categoria
-        fields = ['id', 'name', 'items', 'item_count']
+        fields = ['id', 'nombre', 'items', 'item_count']
 
     def get_name(self, obj):
         """Asegura que el campo se llame 'name' en el JSON"""
