@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,8 +30,23 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
 
+# ... otras configuraciones ...
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# Configuración para admin
+ADMIN_SITE_HEADER = "🍽️ QuickMenu Admin"
+ADMIN_SITE_TITLE = "Panel de Control del Restaurante"
+ADMIN_INDEX_TITLE = "Gestión del Menú Digital"
+
+
+
+
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +57,9 @@ INSTALLED_APPS = [
        # Third party apps
     'rest_framework',
     'corsheaders',
+    'admin_interface',
+    'colorfield',  # Requerido por admin_interface
+  
     
     'menu_backend.menu',  # Nuestra aplicación del menú
 ]
