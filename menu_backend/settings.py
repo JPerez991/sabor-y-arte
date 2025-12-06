@@ -168,3 +168,24 @@ REST_FRAMEWORK = {
     ]
 }
 
+
+
+# Configuración de seguridad para Render
+if 'RENDER' in os.environ:
+    # Seguridad
+    DEBUG = False
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    
+    # Secret key segura (Render la genera automáticamente)
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    
+    # Hosts permitidos
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    ALLOWED_HOSTS.append('quickmenu-backend.onrender.com')  # tu dominio
