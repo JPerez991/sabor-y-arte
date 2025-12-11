@@ -65,10 +65,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ¡Aquí!
     'corsheaders.middleware.CorsMiddleware',  # ← DEBE IR PRIMERO
-   # 'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,6 +76,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'menu_backend.urls'
+
+
 
 TEMPLATES = [
     {
@@ -156,13 +156,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ========== AGREGAR ESTO AL FINAL ==========
 
 # Configuración CORS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://sabor-y-arte.onrender.com",  # tu backend
+    "https://sabor-y-arte-frontend.vercel.app",  # ESTA será tu URL de Vercel
+    "http://localhost:3000",
+]
 
-# Configuración para archivos estáticos
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+CORS_ALLOW_CREDENTIALS = True
 
 # Configuración para archivos multimedia
 MEDIA_URL = '/media/'
