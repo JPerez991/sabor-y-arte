@@ -5,7 +5,6 @@ Django settings for menu_backend project.
 import os
 import dj_database_url
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,21 +13,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-jkodbu2a^jg-te8c=ira-c^42@93w!n4^n=d!fj7_ob1gyarrb')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ  # False en Render, True local
+# ✅ CORREGIDO: DEBUG debe ser True temporalmente para diagnosticar
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# Para desarrollo local
-if DEBUG:
-    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+# ✅ CORREGIDO: Añadir hosts manualmente desde el inicio
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',  # Permite cualquier subdominio de Render
+]
 
 # Application definition
+# ✅ CORREGIDO: Comas añadidas y orden corregido
 INSTALLED_APPS = [
-    'jet',
     'admin_interface',
     'colorfield',
     'django.contrib.admin',
@@ -39,13 +36,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'menu_backend.menu',
+    'menu_backend.menu',  # Tu app
+    # 'jet',  # ⚠️ COMENTA JET TEMPORALMENTE - puede causar conflictos
 ]
+
+# ✅ CORREGIDO: Añade esto para admin_interface
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS debe estar aquí
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,10 +61,12 @@ ROOT_URLCONF = 'menu_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # ✅ Añade directorio templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                # ✅ CORREGIDO: Añade todos los context processors necesarios
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -100,6 +104,11 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# ✅ Añade esto para WhiteNoise
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -112,33 +121,69 @@ ADMIN_SITE_HEADER = "🍽️ QuickMenu Admin"
 ADMIN_SITE_TITLE = "Panel de Control del Restaurante"
 ADMIN_INDEX_TITLE = "Gestión del Menú Digital"
 
-# CORS Configuration (FIXED - missing bracket)
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "https://sabor-y-arte.onrender.com",
     "https://sabor-y-arte-frontend.vercel.app",
     "http://localhost:3000",
+    "http://localhost:8000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Para desarrollo, permite todos los orígenes
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',  # ✅ Añade esto para ver API en navegador
     ]
 }
 
 # Render production settings
 if 'RENDER' in os.environ:
-    # Security settings
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+    # ✅ Asegura que DEBUG sea False en producción
+    DEBUG = False
+    
+    # Security settings - ⚠️ COMENTA TEMPORALMENTE para diagnosticar
+    # SECURE_HSTS_SECONDS = 31536000
+    # SECURE_SSL_REDIRECT = True
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_BROWSER_XSS_FILTER = True
+    # SECURE_CONTENT_TYPE_NOSNIFF = True
     
     # Allowed hosts
     RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
     if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    
+    # ✅ Añade el host específico de tu app
     ALLOWED_HOSTS.append('sabor-y-arte.onrender.com')
+    
+    # ✅ Desactiva CORS_ALLOW_ALL_ORIGINS en producción
+    CORS_ALLOW_ALL_ORIGINS = False
+
+# ✅ Añade configuración de logging para ver errores
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
