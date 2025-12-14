@@ -5,6 +5,7 @@ Django settings for menu_backend project.
 import os
 import dj_database_url
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,9 +18,17 @@ DEBUG = 'RENDER' not in os.environ  # False en Render, True local
 
 ALLOWED_HOSTS = []
 
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Para desarrollo local
+if DEBUG:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
 # Application definition
 INSTALLED_APPS = [
-    "jet"
+    'jet',
     'admin_interface',
     'colorfield',
     'django.contrib.admin',
