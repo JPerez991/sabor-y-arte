@@ -28,7 +28,6 @@ if DEBUG:
 
 # Application definition
 INSTALLED_APPS = [
-    'jet',
     'admin_interface',
     'colorfield',
     'django.contrib.admin',
