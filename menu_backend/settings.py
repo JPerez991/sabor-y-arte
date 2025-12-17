@@ -75,12 +75,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'menu_backend.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
+# If DATABASE_URL is set (e.g., Render with external DB), use it.
+# Otherwise, fall back to SQLite (for local dev or Render free tier).
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            conn_max_age=600
+        )
+    }
+else:
+    # Fallback to SQLite for development and free tier deployments
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
