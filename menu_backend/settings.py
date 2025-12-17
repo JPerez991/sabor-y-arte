@@ -14,7 +14,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-jkodbu2a^jg-te8c=ira-c^42@93w!n4^n=d!fj7_ob1gyarrb')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ  # False en Render, True local
+# Allow temporary enabling of DEBUG via environment variable `DJANGO_DEBUG`.
+# Set `DJANGO_DEBUG=1` in Render to see tracebacks while debugging, then remove it.
+DEBUG = os.environ.get('DJANGO_DEBUG', '').lower() in ('1', 'true', 'yes') or ('RENDER' not in os.environ)
 
 ALLOWED_HOSTS = []
 
