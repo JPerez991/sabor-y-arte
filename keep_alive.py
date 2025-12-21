@@ -10,7 +10,7 @@ def ping_app():
     except Exception as e:
         print(f"Error en ping: {e}")
 
-if __name__ == "__main__":
+if __name__ == "__backendR__":
     # Ejecutar cada 10 minutos
     while True:
         ping_app()
